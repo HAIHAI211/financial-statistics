@@ -1,0 +1,30 @@
+{
+  "pages": [
+    "pages/index/main",
+    "pages/gift/main"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#F5F5F5",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "步好玩",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#3ACF7A",
+    "backgroundColor": "#fff",
+    "borderStyle": "black",
+    "list": [{
+      "pagePath": "pages/index/main",
+      "text": "财务",
+      "iconPath": "/static/img/index_gray.png",
+      "selectedIconPath": "/static/img/index_green.png"
+    }, {
+      "pagePath": "pages/gift/main",
+      "text": "账号",
+      "iconPath": "/static/img/gift_gray.png",
+      "selectedIconPath": "/static/img/gift_green.png"
+    }]
+  }
+}

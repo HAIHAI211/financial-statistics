@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "极客视频",
+  "usingComponents": {
+    "txv-video": "plugin://tencentvideo/video"
+  }
+}

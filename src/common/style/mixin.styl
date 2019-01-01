@@ -1,0 +1,132 @@
+// 背景图片
+bg-image($url, $type='png')
+  background-image: url("https://profile-1257124244.cos.ap-chengdu.myqcloud.com/micoapp/" + $url + "%402x." + $type)
+  @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3)
+    background-image: url("https://profile-1257124244.cos.ap-chengdu.myqcloud.com/micoapp/" + $url + "%403x." + $type)
+
+simple-bg-image($url, $type='png')
+  background-image: url("https://profile-1257124244.cos.ap-chengdu.myqcloud.com/micoapp/" + $url + "." + $type)
+
+//大小和背景图片大小一致
+bg-size($w,$h)
+  width $w
+  height $h
+  background-size $w $h
+
+// 不换行
+no-wrap()
+  text-overflow: ellipsis
+  overflow: hidden
+  white-space: nowrap
+
+// n行省略号
+wrap($n)
+  display -webkit-box
+  overflow hidden
+  text-overflow ellipsis
+  word-break break-all
+  -webkit-box-orient vertical
+  -webkit-line-clamp $n/*第几行裁剪*/
+
+// 内部水平和垂直方向都居中
+center()
+  display: flex
+  align-items: center
+  justify-content: center
+
+// 扩展点击区域
+extend-click()
+  position: relative
+  &:before
+    content: ''
+    position: absolute
+    top: -10px
+    left: -10px
+    right: -10px
+    bottom: -10px
+
+
+// overlay
+overlay()
+  position fixed
+  top 0
+  left 0
+  right 0
+  bottom 0
+  background rgba(0,0,0,.3)
+
+// iphone6设计稿下rpx和px转换
+rpx2px($rpx)
+  unit(0.5 * $rpx,px)
+
+px2rpx($px)
+  unit(2 * $px, 'rpx')
+
+// 动画demo
+// animation: name duration timing-function delay iteration-count direction;
+@-webkit-keyframes lanimation
+{
+  from {transform: scale(1)}
+  to {transform: scale(1.2)}
+}
+
+@-webkit-keyframes up-down-animation
+{
+  from {transform: translateY(0)}
+  to {transform: translateY(12rpx)}
+}
+
+@-webkit-keyframes fade-scale-animation
+{
+  from {
+    opacity 0.8
+    transform: scale(1,1)
+  }
+  to {
+    opacity 1
+    transform: scale(1.5,1.5)
+  }
+}
+@-webkit-keyframes scale-animation
+{
+  from {
+    transform: scale(1,1)
+  }
+  to {
+    transform: scale(1.1,1.1)
+  }
+}
+@-webkit-keyframes rotate-animation
+{
+  from {
+    transform: rotate(-5deg)
+  }
+  to {
+    transform: rotate(5deg)
+  }
+}
+@-webkit-keyframes move-disappear-animation
+{
+  from {
+    opacity: 1
+  }
+  to {
+    $r = 100rpx
+    $l = 750rpx - $r
+    transform: scale(0,0)
+    opacity: 0
+    top:0
+    left:$l
+  }
+}
+@-webkit-keyframes scale-disappear-animation
+{
+  from {
+    transform: scale(1,1)
+  }
+  to {
+    transform: scale(0,0)
+  }
+}
+
+
