@@ -116,6 +116,11 @@ const actions = {
     const result = await api.getRule()
     // console.log('rule', result.data)
     commit(types.SET_RULE, result.data)
+  },
+  async FETCH_FINANCIAL_CATEGORY_LIST ({commit}) {
+    const result = await api.getFinancialCategory()
+    console.log('financial category list:', result)
+    commit(types.SET_FINANCIAL_CATEGORY_LIST, result.data)
   }
 }
 export default actions

@@ -38,6 +38,21 @@ export const get = (params) => {
 export const post = (params) => {
   return fly.post(`${host}${params.url}`, params.data)
 }
+// 创建财务报表
+export const createFinancial = (params) => {
+  return post({
+    url: '/financial/create',
+    data: params
+  })
+}
+
+// 获取财务类别
+export const getFinancialCategory = (params) => {
+  return get({
+    url: '/financial/category'
+  })
+}
+
 // 封装的登录请求，根据后台接收方式选择是否加qs.stringify
 export const login = params => {
   return post({

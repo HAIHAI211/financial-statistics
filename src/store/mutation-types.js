@@ -1,3 +1,4 @@
+export const SET_FINANCIAL_CATEGORY_LIST = 'SET_FINANCIAL_CATEGORY_LIST'
 export const SET_OPEN_ID = 'SET_OPEN_ID'
 export const SET_RULE = 'SET_RULE'
 export const SET_IS_LOGIN = 'SET_IS_LOGIN'

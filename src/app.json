@@ -1,13 +1,14 @@
 {
   "pages": [
     "pages/index/main",
-    "pages/gift/main"
+    "pages/account/main",
+    "pages/financial-add/main"
   ],
   "window": {
     "backgroundTextStyle": "dark",
     "backgroundColor": "#F5F5F5",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "步好玩",
+    "navigationBarTitleText": "harrison&lanny",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
@@ -21,7 +22,7 @@
       "iconPath": "/static/img/index_gray.png",
       "selectedIconPath": "/static/img/index_green.png"
     }, {
-      "pagePath": "pages/gift/main",
+      "pagePath": "pages/account/main",
       "text": "账号",
       "iconPath": "/static/img/gift_gray.png",
       "selectedIconPath": "/static/img/gift_green.png"

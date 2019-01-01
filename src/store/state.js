@@ -1,4 +1,5 @@
 const state = {
+  financialCategoryList: [], // 财务种类
   openId: '',
   rule: '',
   isLogin: false,
