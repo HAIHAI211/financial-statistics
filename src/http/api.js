@@ -53,6 +53,13 @@ export const getFinancialCategory = (params) => {
   })
 }
 
+// 获取用户
+export const getFinancialUser = (params) => {
+  return get({
+    url: '/financial/user'
+  })
+}
+
 // 封装的登录请求，根据后台接收方式选择是否加qs.stringify
 export const login = params => {
   return post({

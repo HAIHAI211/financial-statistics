@@ -21,6 +21,9 @@ const mutations = {
   [types.SET_FINANCIAL_CATEGORY_LIST] (state, v) {
     state.financialCategoryList = v
   },
+  [types.SET_FINANCIAL_USER_LIST] (state, v) {
+    state.financialUserList = v
+  },
   [types.SET_OPEN_ID] (state, v) {
     state.openId = v
   },
