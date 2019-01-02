@@ -3,7 +3,7 @@
     <picker
       mode="date"
       fields="month"
-      :value="date"
+      :value="financialMonth"
       @cancel="more=!more"
       @change="_monthChange">
         <div class="picker date-picker" @click="more=!more">
@@ -12,7 +12,9 @@
         </div>
     </picker>
     <button plain class="save-btn" @click="_save">保存</button>
-    <div class="card" v-for="(financialDetail, financialDetailIndex) in financialDTO.financialDetailList" :key="financialDetailIndex">
+    <div class="card"
+         v-for="(financialDetail, financialDetailIndex) in financialDTO.financialDetailList"
+         :key="financialDetailIndex">
       <div class="head">
         <picker
           @change="_userChange($event, financialDetailIndex)"
@@ -34,6 +36,7 @@
             <div :class="['iconfont','icon-sanjiao', {'sanjiao-more': selfDetailList[financialDetailIndex].categoryArrowDown}]"/>
           </div>
         </picker>
+        <div class="close-btn" @click="_close(financialDetailIndex)">✖</div>
       </div>
       <div class="item">
         <div class="label">负债：</div>
@@ -63,12 +66,13 @@
         </div>
       </div>
     </div>
-    <div class="add-btn">+</div>
+    <div class="add-btn" @click="_add">+</div>
   </div>
 </template>
 <script>
 import {mapState} from 'vuex'
 import ENUM from '@/enum'
+// import {createFinancial} from '@/http/api'
 export default {
   data () {
     return {
@@ -78,9 +82,6 @@ export default {
       deadline: '2019-01-01',
       categoryIndex: 0,
       more: true,
-      categoryArrowDown: true,
-      isDebt: true,
-      haspay: false,
       financialDTO: {
         masterId: null,
         financialDate: null,
@@ -120,8 +121,25 @@ export default {
     }
   },
   methods: {
-    _save () {
-      console.log(this.financialDTO)
+    _financialDetailFactory () {
+      return {
+        detailId: null,
+        masterId: null,
+        userId: this.financialUserList[0].userId,
+        categoryType: this.financialCategoryList[0].categoryType,
+        financialPrice: 0,
+        isDebt: ENUM.DEBT,
+        deadline: new Date(),
+        hasPay: ENUM.NO_PAY
+      }
+    },
+    _selfDetailFactory () {
+      return {
+        categoryArrowDown: true,
+        categoryIndex: 0,
+        userIndex: 0,
+        price: 0
+      }
     },
     _monthChange (e) {
       this.more = !this.more
@@ -162,6 +180,35 @@ export default {
       this.selfDetailList[financialDetailIndex].price = v
       this.financialDTO.financialDetailList[financialDetailIndex].financialPrice = isDebt ? -v : v
       console.log(e.mp.detail.value)
+    },
+    _add () { // 新增financialDetail
+      if (this.isAdd) {
+        this.financialDTO.financialDetailList = [
+          ...this.financialDTO.financialDetailList,
+          this._financialDetailFactory()
+        ]
+        this.selfDetailList = [
+          ...this.selfDetailList,
+          this._selfDetailFactory()
+        ]
+      }
+    },
+    _close (financialDetailIndex) { // 删除financialDetail
+      wx.showModal({
+        title: '提示',
+        content: '是否删除该明细?',
+        success: (res) => {
+          if (res.confirm) {
+            this.financialDTO.financialDetailList.splice(financialDetailIndex, 1)
+            this.selfDetailList.splice(financialDetailIndex, 1)
+          }
+        }
+      })
+    },
+    async _save () {
+      console.log(this.financialDTO)
+      // const result = await createFinancial(this.financialDTO)
+      // console.log(result)
     }
   },
   onLoad (options) {
@@ -173,27 +220,9 @@ export default {
         masterId: null,
         financialDate: now,
         financialAmount: 0,
-        financialDetailList: [
-          {
-            detailId: null,
-            masterId: null,
-            userId: null,
-            categoryType: this.financialCategoryList[0].categoryType,
-            financialPrice: 0,
-            isDebt: ENUM.DEBT,
-            deadline: now,
-            hasPay: ENUM.NO_PAY
-          }
-        ]
+        financialDetailList: [this._financialDetailFactory()]
       }
-      this.selfDetailList = [
-        {
-          categoryArrowDown: true,
-          categoryIndex: 0,
-          userIndex: 0,
-          price: 0
-        }
-      ]
+      this.selfDetailList = [this._selfDetailFactory()]
     }
     console.log(this.financialCategoryList)
   }
@@ -204,7 +233,7 @@ export default {
   @import "~@/common/style/mixin.styl"
   @import "~@/common/style/color.styl"
   .financial-add-page{
-    height 100%
+    padding-bottom 120rpx
     .picker{
       center()
       &.date-picker{
@@ -231,6 +260,7 @@ export default {
     }
     .card{
       margin 0 auto
+      margin-bottom 50rpx
       width 700rpx
       border-radius 10rpx
       background #fff
@@ -258,6 +288,13 @@ export default {
           &.female{
             background lightpink
           }
+        }
+        .close-btn{
+          position absolute
+          font-size 40rpx
+          color #999
+          top 0
+          right 0
         }
       }
       .line-item{
@@ -291,6 +328,7 @@ export default {
       margin 40rpx auto
     }
     .save-btn{
+      z-index 500
       position fixed
       bottom 0
       background lightseagreen
