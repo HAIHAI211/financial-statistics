@@ -60,6 +60,14 @@ export const getFinancialUser = (params) => {
   })
 }
 
+// 获取月报表
+export const getMonthMasters = (params) => {
+  return get({
+    url: '/financial/month',
+    data: params
+  })
+}
+
 // 封装的登录请求，根据后台接收方式选择是否加qs.stringify
 export const login = params => {
   return post({

@@ -5,13 +5,19 @@
 </template>
 <script>
 import {mapActions} from 'vuex'
+import {getMonthMasters} from '@/http/api'
 export default {
   methods: {
     ...mapActions(['FETCH_FINANCIAL_CATEGORY_LIST', 'FETCH_FINANCIAL_USER_LIST'])
   },
-  mounted () {
+  async mounted () {
     this.FETCH_FINANCIAL_CATEGORY_LIST()
     this.FETCH_FINANCIAL_USER_LIST()
+    const result = await getMonthMasters({
+      pageNum: 0,
+      pageSize: 10
+    })
+    console.log('monthMasters', result)
   }
 }
 </script>

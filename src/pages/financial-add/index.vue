@@ -86,6 +86,10 @@ export default {
         masterId: null,
         financialDate: null,
         financialAmount: 0,
+        financialIncome: 0,
+        financialDebt: 0,
+        financialWaitDebt: 0,
+        financialClearDebt: 0,
         financialDetailList: [
           {
             detailId: null,
@@ -116,11 +120,24 @@ export default {
     },
     financialMonth () {
       if (!this.financialDTO.financialDate) return null
-      let fd = this.$utils.harrisonDate.getDate(this.financialDTO.financialDate, {showDetail: false})
-      return fd.year + '-' + fd.addZeroMonth
+      let arr = this.financialDTO.financialDate.split('-')
+      return arr[0] + '-' + arr[1]
     }
   },
   methods: {
+    _financialMasterFactory () {
+      let dateInfo = this.$utils.harrisonDate.getDate(new Date(), {showDetail: false})
+      let financialDate = dateInfo.year + '-' + dateInfo.addZeroMonth
+      return {
+        masterId: null,
+        financialDate,
+        financialAmount: 0,
+        financialIncome: 0,
+        financialDebt: 0,
+        financialWaitDebt: 0,
+        financialClearDebt: 0
+      }
+    },
     _financialDetailFactory () {
       return {
         detailId: null,
@@ -129,7 +146,7 @@ export default {
         categoryType: this.financialCategoryList[0].categoryType,
         financialPrice: 0,
         isDebt: ENUM.DEBT,
-        deadline: new Date(),
+        deadline: this.$utils.harrisonDate.getDate(new Date(), {showDetail: false}).formatDate,
         hasPay: ENUM.NO_PAY
       }
     },
@@ -145,12 +162,13 @@ export default {
       this.more = !this.more
       console.log('picker发送选择改变，携带值为', e)
       let monthStr = e.mp.detail.value
-      let arr = monthStr.split('-')
-      let resultDate = new Date()
-      resultDate.setFullYear(arr[0])
-      resultDate.setMonth(arr[1] - 1)
-      resultDate.setDate(1)
-      this.financialDTO.financialDate = resultDate
+      this.financialDTO.financialDate = monthStr + '-01'
+      // let arr = monthStr.split('-')
+      // let resultDate = new Date()
+      // resultDate.setFullYear(arr[0])
+      // resultDate.setMonth(arr[1] - 1)
+      // resultDate.setDate(1)
+      // this.financialDTO.financialDate = resultDate
     },
     _userChange (e, financialDetailIndex) {
       console.log('userChange')
@@ -215,11 +233,8 @@ export default {
     console.log(this.financialUserList[0].userName)
     this.isAdd = options.type === 'add'
     if (this.isAdd) { // init
-      let now = new Date()
       this.financialDTO = {
-        masterId: null,
-        financialDate: now,
-        financialAmount: 0,
+        ...this._financialMasterFactory(),
         financialDetailList: [this._financialDetailFactory()]
       }
       this.selfDetailList = [this._selfDetailFactory()]
