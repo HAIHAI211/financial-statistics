@@ -1,21 +1,13 @@
 <template>
   <div class="rule-page">
-    <wxParse :content="rule"/>
+    <wxParse content=""/>
   </div>
 </template>
 <script>
 import wxParse from 'mpvue-wxparse'
-import {mapState} from 'vuex'
 export default {
   components: {
     wxParse
-  },
-  data () {
-    return {
-    }
-  },
-  computed: {
-    ...mapState(['rule'])
   }
 }
 </script>
