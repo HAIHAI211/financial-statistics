@@ -24,6 +24,14 @@ export default {
       loadingState: LOADING_STATE_ENUM.NO_SHOW, // 0:不可见 1:正在加载 2:全部加载完毕 3:异常
       pageIndex: 0,
       apis: [],
+      pages: [
+        {
+          pageNum: this.initPageNum, // 当前页
+          pageSize: this.pageSize, // 一页多少条数据
+          pageCount: 10, // 一共多少页
+          list: []
+        }
+      ],
       pageSize: 10,
       initPageNum: 0, // pageNum的初始页码
       listKeyName: 'data',
@@ -31,18 +39,18 @@ export default {
     }
   },
   computed: {
-    pages () {
-      let result = []
-      for (let i = 0; i < this.apis.length; i++) {
-        result.push({
-          pageNum: this.initPageNum, // 当前页
-          pageSize: this.pageSize, // 一页多少条数据
-          pageCount: 10, // 一共多少页
-          list: []
-        })
-      }
-      return result
-    },
+    // pages () {
+    //   let result = []
+    //   for (let i = 0; i < this.apis.length; i++) {
+    //     result.push({
+    //       pageNum: this.initPageNum, // 当前页
+    //       pageSize: this.pageSize, // 一页多少条数据
+    //       pageCount: 10, // 一共多少页
+    //       list: []
+    //     })
+    //   }
+    //   return result
+    // },
     activePage () {
       return this.pages[this.pageIndex]
     },
@@ -54,6 +62,25 @@ export default {
       let endPageNum = pageCount + this.initPageNum - 1
       let result = endPageNum - this.activePage.pageNum // >=0 表示还可以请求
       return result
+    }
+  },
+  watch: {
+    apis: {
+      immediate: true,
+      // deep: false,
+      handler (newV, oldV) {
+        console.log('newV', newV)
+        let result = []
+        for (let i = 0; i < newV.length; i++) {
+          result.push({
+            pageNum: this.initPageNum, // 当前页
+            pageSize: this.pageSize, // 一页多少条数据
+            pageCount: 10, // 一共多少页
+            list: []
+          })
+        }
+        this.pages = result
+      }
     }
   },
   methods: {

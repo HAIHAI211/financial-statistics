@@ -4,6 +4,7 @@
   </div>
 </template>
 <script>
+  import {LOADING_STATE_ENUM} from '@/utils/harrison-mp-utils/enum'
   export default {
     props: {
       state: { // 0:不可见 1:正在加载 2:全部加载完毕 3:异常
@@ -14,11 +15,11 @@
     computed: {
       loadingMsg () {
         let msg = ''
-        if (this.state === this.$utils.harrisonEnum.LOADING_STATE_ENUM.IS_LOADING) {
+        if (this.state === LOADING_STATE_ENUM.IS_LOADING) {
           msg = '正在加载'
-        } else if (this.state === this.$utils.harrisonEnum.LOADING_STATE_ENUM.ALL_OVER) {
+        } else if (this.state === LOADING_STATE_ENUM.ALL_OVER) {
           msg = '已显示全部'
-        } else if (this.state === this.$utils.harrisonEnum.LOADING_STATE_ENUM.ERROR) {
+        } else if (this.state === LOADING_STATE_ENUM.ERROR) {
           msg = '加载异常 请稍后重试'
         }
         return `${msg}`

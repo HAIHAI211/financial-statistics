@@ -2,38 +2,58 @@
   <div class="index-page">
     <navigator class="add-btn" url="/pages/financial-add/main?type=add">+</navigator>
     <div class="card" v-for="(item,itemIndex) in activePage.list" :key="itemIndex">
-      <div class="card-item">
-        <div class="label">月份</div>
-        <div class="value">{{item.financialDate}}</div>
+      <div class="row head">
+        <div class="card-item">
+          <div class="value month-value">{{formatDates[itemIndex]}}</div>
+        </div>
+        <div class="card-item vertical">
+          <div class="label head-label">总资产(元)</div>
+          <div :class="['value', 'head-value', 'green', {'red': item.financialAmount >= 0}]">{{item.financialAmount}}</div>
+        </div>
       </div>
-      <div class="card-item">
-        <div class="label">负债总额</div>
-        <div class="value">{{item.financialDebt}}</div>
+      <div class="row">
+        <div class="card-item vertical first">
+          <div class="label">负债总额</div>
+          <div class="value">{{item.financialDebt}}</div>
+        </div>
+        <div class="card-item vertical">
+          <div class="label">待偿还</div>
+          <div class="value">{{item.financialWaitDebt}}</div>
+        </div>
       </div>
-      <div class="card-item">
-        <div class="label">待偿还</div>
-        <div class="value">{{item.financialWaitDebt}}</div>
-      </div>
-      <div class="card-item">
-        <div class="label">已偿还</div>
-        <div class="value">{{item.financialClearDebt}}</div>
-      </div>
-      <div class="card-item">
-        <div class="label">收入</div>
-        <div class="value">{{item.financialIncome}}</div>
+      <div class="row">
+        <div class="card-item vertical first">
+          <div class="label">已偿还</div>
+          <div class="value">{{item.financialClearDebt}}</div>
+        </div>
+        <div class="card-item vertical">
+          <div class="label">收入</div>
+          <div class="value">{{item.financialIncome}}</div>
+        </div>
       </div>
     </div>
+    <run-loading :state="loadingState"/>
   </div>
 </template>
 <script>
 import {mapActions} from 'vuex'
 import {getMonthMasters} from '@/http/api'
 import PullToRefreshMixin from '../../utils/harrison-mp-utils/mixin/pullToRefreshMixin'
+import RunLoading from '@/components/run-loading'
 export default {
   mixins: [PullToRefreshMixin],
+  components: {
+    RunLoading
+  },
   data () {
     return {
       apis: [getMonthMasters]
+    }
+  },
+  computed: {
+    formatDates () {
+      let result = this.activePage.list.map(e => e.financialDate.slice(0, -3))
+      return result
     }
   },
   methods: {
@@ -55,7 +75,7 @@ export default {
   @import "~@/common/style/mixin.styl"
   @import "~@/common/style/color.styl"
   .index-page{
-    height 100%
+    padding 20rpx 0 100rpx 0
     .add-btn{
       width 100rpx;
       height 100rpx;
@@ -68,13 +88,61 @@ export default {
       center();
       position fixed;
       left 325rpx;
-      bottom 100rpx;
+      bottom 15rpx;
     }
     .card{
-      border 1rpx solid black
+      background #fff
+      margin 30rpx auto
+      width 700rpx
       border-radius 8rpx
+      .head{
+        padding 20rpx 20rpx
+      }
+      .row{
+        padding 10rpx 20rpx
+        display flex
+        align-items center
+        justify-content space-between
+        border-bottom 1rpx solid #eee
+      }
       .card-item{
         display flex
+        flex 1 0 0
+        justify-content center
+        &.vertical{
+          align-items center
+          flex-direction column
+        }
+        &.first{
+          border-right 1rpx solid #eee
+        }
+        .label{
+          font-size 30rpx
+          padding-bottom 8rpx
+          &.head-label{
+            color #ccc
+            font-size 35rpx
+          }
+        }
+        .value{
+          color #888
+          font-size 28rpx
+          &.month-value{
+            color #000
+            font-size 40rpx
+            font-weight bold
+          }
+          &.head-value{
+            font-size 45rpx
+            font-weight bolder
+            &.green{
+              color lightseagreen
+            }
+            &.red{
+              color darkred
+            }
+          }
+        }
       }
     }
   }
