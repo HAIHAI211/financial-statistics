@@ -8,8 +8,6 @@ import config from '@/config'
 const Fly = require('flyio/dist/npm/wx')
 const fly = new Fly()
 
-class ServiceError extends Error {
-}
 // 配置请求基地址
 // //定义公共headers
 // fly.config.headers={xx:5,bb:6,dd:7}
@@ -40,42 +38,38 @@ fly.interceptors.response.use(
   (response) => {
     // wx.hideLoading()
     // 只将请求结果的data字段返回
-    if (response.data && response.data.code === 0) {
-      return response.data
+    let res = response.data
+    if (res.code === 0) {
+      return res
     } else {
-      let errMsg = '网络异常，请重试'
-      if (response.data.data && response.data.data.detailMessage) {
-        errMsg = response.data.data.detailMessage
-      }
-      // wx.showToast({title: errMsg, icon: 'none'})
-      return Promise.reject(new ServiceError(errMsg))
+      return Promise.reject(res)
     }
   },
   (er) => {
+    return er
     // wx.hideLoading()
     // 发生网络错误后会走到这里
     // console.log('错误', er)
 
     // 请求出错，根据返回状态码判断出错原因
-    wx.stopPullDownRefresh()
     // wx.hideLoading()
-    let errMsg = ''
-    if (er.status === 0) {
-      errMsg = '网络连接异常'
-    } else if (er.status === 1) {
-      errMsg = '网络连接超时'
-    } else if (er.status === 401) {
-      errMsg = '用户未登录'
-    } else {
-      errMsg = '请求数据失败,请稍后再试'
-      // if (er.response.data.message) {
-      //   errMsg = er.response.data.message
-      // } else {
-      //   errMsg = '请求数据失败,请稍后再试'
-      // }
-    }
+    // let errMsg = ''
+    // if (er.status === 0) {
+    //   errMsg = '网络连接异常'
+    // } else if (er.status === 1) {
+    //   errMsg = '网络连接超时'
+    // } else if (er.status === 401) {
+    //   errMsg = '用户未登录'
+    // } else {
+    //   errMsg = '请求数据失败,请稍后再试'
+    //   // if (er.response.data.message) {
+    //   //   errMsg = er.response.data.message
+    //   // } else {
+    //   //   errMsg = '请求数据失败,请稍后再试'
+    //   // }
+    // }
     // wx.showToast({title: errMsg, icon: 'none'})
-    return errMsg
+    // return errMsg
     // return Promise.resolve('xxx')
   }
 )

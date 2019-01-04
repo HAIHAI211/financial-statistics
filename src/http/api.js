@@ -66,11 +66,3 @@ export const getMonthMasters = (params) => {
     data: params
   })
 }
-
-// 封装的登录请求，根据后台接收方式选择是否加qs.stringify
-export const login = params => {
-  return post({
-    url: '/user/login',
-    data: params
-  })
-}

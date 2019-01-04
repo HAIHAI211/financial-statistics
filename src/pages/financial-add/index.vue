@@ -73,6 +73,7 @@
 import {mapState} from 'vuex'
 import ENUM from '@/enum'
 import {createFinancial} from '@/http/api'
+import {getDate} from 'harrison-mp-utils/date'
 export default {
   data () {
     return {
@@ -125,7 +126,7 @@ export default {
     _financialMasterFactory () {
       return {
         masterId: null,
-        financialDate: this.$utils.harrisonDate.getDate(new Date()).formatDate,
+        financialDate: getDate(new Date()).formatDate,
         financialAmount: 0,
         financialIncome: 0,
         financialDebt: 0,
@@ -140,7 +141,7 @@ export default {
         userId: this.financialUserList[0].userId,
         categoryType: this.financialCategoryList[0].categoryType,
         financialPrice: 0,
-        deadline: this.$utils.harrisonDate.getDate(new Date()).formatDate,
+        deadline: getDate(new Date()).formatDate,
         isDebt: ENUM.DEBT,
         hasPay: ENUM.NO_PAY
       }
@@ -221,7 +222,8 @@ export default {
         const result = await createFinancial(this.financialDTO)
         console.log(result)
       } catch (e) {
-        console.log('error', e.response.data.message)
+        console.log('error', e)
+        this.utils.showError(e.msg, 1000)
       }
     }
   },
