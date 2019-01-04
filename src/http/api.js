@@ -1,6 +1,5 @@
 import fly from './config'
 import qs from 'qs'
-import store from '../store'
 
 import config from '@/config'
 const host = config.host
