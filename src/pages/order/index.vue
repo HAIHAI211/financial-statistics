@@ -12,27 +12,27 @@
                 <div class="price">
                   <div class="num">{{ morder.price }}</div>
                   <div class="suffix">数学币</div>
-                </div>
               </div>
             </div>
-            <div class="bottom">
-              <div class="btn btn-see" @click="_openOn(morder)">查看</div>
-              <div class="btn btn-download" @click="_download(morder)">下载</div>
-            </div>
+          </div>
+          <div class="bottom">
+            <div class="btn btn-see" @click="_openOn(morder)">查看</div>
+            <div class="btn btn-download" @click="_download(morder)">下载</div>
           </div>
         </div>
-      </van-tab>
-      <van-tab title="实物礼品">
-        <div class="order-list physical">
-          <div class="physical-order" v-for="(porder,porderIndex) in activePage.list" :key="porderIndex">
-            <div class="top" v-if="porder.status === 1">
-              <span>运单号：{{ porder.waybillNo }}</span>
-              <div class="copy" @click="_copy(porder.waybillNo)">复制运单号</div>
-            </div>
-            <div class="main">
-              <image class="icon" :src="porder.coverPicUrl"/>
-              <div class="right">
-                <div class="title">{{ porder.name }}</div>
+  </div>
+  </van-tab>
+  <van-tab title="实物礼品">
+    <div class="order-list physical">
+      <div class="physical-order" v-for="(porder,porderIndex) in activePage.list" :key="porderIndex">
+        <div class="top" v-if="porder.status === 1">
+          <span>运单号：{{ porder.waybillNo }}</span>
+          <div class="copy" @click="_copy(porder.waybillNo)">复制运单号</div>
+        </div>
+        <div class="main">
+          <image class="icon" :src="porder.coverPicUrl"/>
+          <div class="right">
+            <div class="title">{{ porder.name }}</div>
                 <div class="info">
                   <div class="price">
                     <div class="num">{{ porder.price }}</div>
