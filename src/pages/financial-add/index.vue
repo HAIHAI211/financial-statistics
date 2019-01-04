@@ -53,10 +53,10 @@
           <picker
             mode="date"
             fields="day"
-            :value="deadline"
+            :value="financialDetail.deadline"
             @change="_deadlineChange">
             <div class="picker deadline-picker">
-              {{deadline}}
+              {{financialDetail.deadline}}
             </div>
           </picker>
         </div>
@@ -72,15 +72,12 @@
 <script>
 import {mapState} from 'vuex'
 import ENUM from '@/enum'
-// import {createFinancial} from '@/http/api'
+import {createFinancial} from '@/http/api'
 export default {
   data () {
     return {
       ENUM: ENUM,
       isAdd: true,
-      date: '2019-01',
-      deadline: '2019-01-01',
-      categoryIndex: 0,
       more: true,
       financialDTO: {
         masterId: null,
@@ -126,11 +123,9 @@ export default {
   },
   methods: {
     _financialMasterFactory () {
-      let dateInfo = this.$utils.harrisonDate.getDate(new Date(), {showDetail: false})
-      let financialDate = dateInfo.year + '-' + dateInfo.addZeroMonth
       return {
         masterId: null,
-        financialDate,
+        financialDate: this.$utils.harrisonDate.getDate(new Date()).formatDate,
         financialAmount: 0,
         financialIncome: 0,
         financialDebt: 0,
@@ -145,8 +140,8 @@ export default {
         userId: this.financialUserList[0].userId,
         categoryType: this.financialCategoryList[0].categoryType,
         financialPrice: 0,
+        deadline: this.$utils.harrisonDate.getDate(new Date()).formatDate,
         isDebt: ENUM.DEBT,
-        deadline: this.$utils.harrisonDate.getDate(new Date(), {showDetail: false}).formatDate,
         hasPay: ENUM.NO_PAY
       }
     },
@@ -163,12 +158,9 @@ export default {
       console.log('picker发送选择改变，携带值为', e)
       let monthStr = e.mp.detail.value
       this.financialDTO.financialDate = monthStr + '-01'
-      // let arr = monthStr.split('-')
-      // let resultDate = new Date()
-      // resultDate.setFullYear(arr[0])
-      // resultDate.setMonth(arr[1] - 1)
-      // resultDate.setDate(1)
-      // this.financialDTO.financialDate = resultDate
+    },
+    _deadlineChange (e, financialDetailIndex) {
+      this.financialDTO.financialDetailList[financialDetailIndex].deadline = e.mp.detail.value
     },
     _userChange (e, financialDetailIndex) {
       console.log('userChange')
@@ -225,8 +217,12 @@ export default {
     },
     async _save () {
       console.log(this.financialDTO)
-      // const result = await createFinancial(this.financialDTO)
-      // console.log(result)
+      try {
+        const result = await createFinancial(this.financialDTO)
+        console.log(result)
+      } catch (e) {
+        console.log('error', e.response.data.message)
+      }
     }
   },
   onLoad (options) {
@@ -307,7 +303,7 @@ export default {
         .close-btn{
           position absolute
           font-size 40rpx
-          color #999
+          color #ddd
           top 0
           right 0
         }
