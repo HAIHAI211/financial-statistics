@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "switch-cell": "/static/vant/switch-cell/index"
-  },
-  "enablePullDownRefresh": true
-}

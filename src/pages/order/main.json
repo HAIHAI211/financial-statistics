@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "van-tab": "/static/vant/tab/index",
-    "van-tabs": "/static/vant/tabs/index"
-  },
-  "navigationBarTitleText": "我的订单",
-  "enablePullDownRefresh": true
-}
