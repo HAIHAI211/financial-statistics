@@ -1,7 +1,7 @@
 <template>
   <div class="index-page">
     <navigator class="add-btn" url="/pages/financial-add/main?type=add">+</navigator>
-    <div class="card" v-for="(item,itemIndex) in activePage.list" :key="itemIndex">
+    <div class="card" v-for="(item,itemIndex) in activePage.list" :key="itemIndex" @click="_monthCardClick(item.masterId)">
       <div class="row head">
         <div class="card-item">
           <div class="value month-value">{{formatDates[itemIndex]}}</div>
@@ -57,7 +57,12 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['FETCH_FINANCIAL_CATEGORY_LIST', 'FETCH_FINANCIAL_USER_LIST'])
+    ...mapActions(['FETCH_FINANCIAL_CATEGORY_LIST', 'FETCH_FINANCIAL_USER_LIST']),
+    _monthCardClick (masterId) {
+      wx.navigateTo({
+        url: `/pages/financial-add/main?type=edit&masterId=${masterId}`
+      })
+    }
   },
   async mounted () {
     this.FETCH_FINANCIAL_CATEGORY_LIST()

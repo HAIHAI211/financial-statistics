@@ -66,3 +66,13 @@ export const getMonthMasters = (params) => {
     data: params
   })
 }
+
+// 获取月报表明细
+export const getMonthDetails = (masterId) => {
+  return get({
+    url: '/financial/detail',
+    data: {
+      masterId
+    }
+  })
+}

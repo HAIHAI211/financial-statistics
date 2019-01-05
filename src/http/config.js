@@ -42,10 +42,12 @@ fly.interceptors.response.use(
     if (res.code === 0) {
       return res
     } else {
+      wx.stopPullDownRefresh()
       return Promise.reject(res)
     }
   },
   (er) => {
+    wx.stopPullDownRefresh()
     return er
     // wx.hideLoading()
     // 发生网络错误后会走到这里

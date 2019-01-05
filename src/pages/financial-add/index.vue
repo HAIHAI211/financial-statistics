@@ -4,11 +4,10 @@
       mode="date"
       fields="month"
       :value="financialMonth"
-      @cancel="more=!more"
       @change="_monthChange">
-        <div class="picker date-picker" @click="more=!more">
+        <div class="picker date-picker">
           {{ financialMonth }}
-          <div :class="['iconfont','icon-sanjiao', {'sanjiao-more': more}]"/>
+          <div class="iconfont icon-sanjiao sanjiao-more"/>
         </div>
     </picker>
     <button plain class="save-btn" @click="_save">保存</button>
@@ -16,35 +15,40 @@
          v-for="(financialDetail, financialDetailIndex) in financialDTO.financialDetailList"
          :key="financialDetailIndex">
       <div class="head">
-        <picker
-          @change="_userChange($event, financialDetailIndex)"
-          :value="selfDetailList[financialDetailIndex].userIndex"
+        <my-picker
           :range="financialUserList"
-          range-key="userName"
-          v-if="financialUserList.length">
-          <div :class="['avatar',{'female': financialUserList[selfDetailList[financialDetailIndex].userIndex].userSex === ENUM.WOMEN}]">{{ financialUserList[selfDetailList[financialDetailIndex].userIndex].userName }}</div>
-        </picker>
-        <picker
-          @change="_categoryChange($event, financialDetailIndex)"
-          @cancel="selfDetailList[financialDetailIndex].categoryArrowDown=!selfDetailList[financialDetailIndex].categoryArrowDown"
-          :value="selfDetailList[financialDetailIndex].categoryIndex"
+          rangeKey="userName"
+          valueKey="userId"
+          v-model="financialDetail.userId">
+          <div :class="['avatar',{'female': scope.userSex === 0}]">{{ scope.userName }}</div>
+        </my-picker>
+        <my-picker
           :range="financialCategoryList"
-          range-key="categoryName"
-          v-if="financialCategoryList.length">
-          <div class="picker category-picker" @click="selfDetailList[financialDetailIndex].categoryArrowDown=!selfDetailList[financialDetailIndex].categoryArrowDown">
-            {{ financialCategoryList[selfDetailList[financialDetailIndex].categoryIndex].categoryName }}
-            <div :class="['iconfont','icon-sanjiao', {'sanjiao-more': selfDetailList[financialDetailIndex].categoryArrowDown}]"/>
+          rangeKey="categoryName"
+          valueKey="categoryType"
+          v-model="financialDetail.categoryType">
+          <div class="picker category-picker">
+            {{ scope.categoryName }}
+            <div class="iconfont icon-sanjiao sanjiao-more"/>
           </div>
-        </picker>
+        </my-picker>
         <div class="close-btn" @click="_close(financialDetailIndex)">✖</div>
       </div>
       <div class="item">
         <div class="label">负债：</div>
-        <div class="value" style="margin-right:30rpx;"><switch :checked="financialDetail.isDebt" @change="_debtSwitchChange($event,financialDetailIndex)" color="#990000" type="checkbox"/></div>
+        <div class="value" style="margin-right:30rpx;">
+          <switch :checked="financialDetail.isDebt"
+                  @change="_debtSwitchChange($event,financialDetailIndex)"
+                  color="#990000" type="checkbox"/>
+        </div>
         <div class="label">金额：</div>
         <div class="value" style="display: flex; align-items: center">
           <span>{{ financialDetail.isDebt ? '-' : '+' }}</span>
-          <input type="digit" :placeholder="financialPricePlaceholder" class="input" :value="selfDetailList[financialDetailIndex].price" @blur="_priceChange($event, financialDetailIndex)">
+          <input type="digit"
+                 :placeholder="financialPricePlaceholder"
+                 class="input"
+                 :value="detailPrices[financialDetailIndex]"
+                 @blur="_priceChange($event, financialDetailIndex)">
         </div>
       </div>
       <div class="item" v-if="financialDetail.isDebt">
@@ -62,7 +66,7 @@
         </div>
         <div class="label">已还清：</div>
         <div class="value">
-          <switch @change="_paySwitchChange" color="#990000"/>
+          <switch @change="_paySwitchChange($event, financialDetailIndex)" color="#990000"/>
         </div>
       </div>
     </div>
@@ -72,14 +76,26 @@
 <script>
 import {mapState} from 'vuex'
 import ENUM from '@/enum'
-import {createFinancial} from '@/http/api'
+import {getMonthDetails} from '@/http/api'
+import MyPicker from '@/components/my-picker'
 import {getDate} from 'harrison-mp-utils/date'
 export default {
+  components: {
+    MyPicker
+  },
+  props: {
+  },
   data () {
     return {
+      scope: {},
       ENUM: ENUM,
       isAdd: true,
       more: true,
+      financialCategory: {
+        categoryId: 5,
+        categoryType: 5,
+        categoryName: '平安信用卡'
+      },
       financialDTO: {
         masterId: null,
         financialDate: null,
@@ -101,14 +117,7 @@ export default {
           }
         ]
       },
-      selfDetailList: [
-        {
-          categoryArrowDown: true,
-          categoryIndex: 0,
-          userIndex: 0,
-          price: 0 // 永远是正值
-        }
-      ]
+      selfPrices: []
     }
   },
   computed: {
@@ -118,8 +127,12 @@ export default {
     },
     financialMonth () {
       if (!this.financialDTO.financialDate) return null
-      let arr = this.financialDTO.financialDate.split('-')
-      return arr[0] + '-' + arr[1]
+      return this.financialDTO.financialDate.slice(0, -3)
+    },
+    detailPrices () {
+      let result = this.financialDTO.financialDetailList.map(e => Math.abs(e.financialPrice))
+      console.log('detailPrices', result)
+      return result
     }
   },
   methods: {
@@ -146,16 +159,7 @@ export default {
         hasPay: ENUM.NO_PAY
       }
     },
-    _selfDetailFactory () {
-      return {
-        categoryArrowDown: true,
-        categoryIndex: 0,
-        userIndex: 0,
-        price: 0
-      }
-    },
     _monthChange (e) {
-      this.more = !this.more
       console.log('picker发送选择改变，携带值为', e)
       let monthStr = e.mp.detail.value
       this.financialDTO.financialDate = monthStr + '-01'
@@ -163,32 +167,19 @@ export default {
     _deadlineChange (e, financialDetailIndex) {
       this.financialDTO.financialDetailList[financialDetailIndex].deadline = e.mp.detail.value
     },
-    _userChange (e, financialDetailIndex) {
-      console.log('userChange')
-      let userIndex = e.mp.detail.value
-      this.selfDetailList[financialDetailIndex].userIndex = userIndex
-      this.financialDTO.financialDetailList[financialDetailIndex].userId = this.financialUserList[userIndex].userId
-    },
-    _categoryChange (e, financialDetailIndex) {
-      this.selfDetailList[financialDetailIndex].categoryArrowDown = !this.selfDetailList[financialDetailIndex].categoryArrowDown
-      console.log('picker发送选择改变，携带值为', e)
-      this.selfDetailList[financialDetailIndex].categoryIndex = e.mp.detail.value
-      this.financialDTO.financialDetailList[financialDetailIndex].categoryType = this.financialCategoryList[e.mp.detail.value].categoryType
-    },
     _debtSwitchChange (e, finanicalDetailIndex) {
       console.log(e.mp.detail.value)
-      let v = this.selfDetailList[finanicalDetailIndex].price
       let isDebt = e.mp.detail.value
+      let price = this.selfPrices[finanicalDetailIndex]
       this.financialDTO.financialDetailList[finanicalDetailIndex].isDebt = isDebt ? 1 : 0
-      this.financialDTO.financialDetailList[finanicalDetailIndex].financialPrice = isDebt ? -v : v
+      this.financialDTO.financialDetailList[finanicalDetailIndex].financialPrice = isDebt ? -price : price
     },
-    _paySwitchChange (e) {
-      this.haspay = e.mp.detail.value
+    _paySwitchChange (e, financialDetailIndex) {
+      this.financialDTO.financialDetailList[financialDetailIndex].hasPay = e.mp.detail.value ? 1 : 0
     },
     _priceChange (e, financialDetailIndex) {
       let v = Math.abs(e.mp.detail.value)
       let isDebt = this.financialDTO.financialDetailList[financialDetailIndex].isDebt
-      this.selfDetailList[financialDetailIndex].price = v
       this.financialDTO.financialDetailList[financialDetailIndex].financialPrice = isDebt ? -v : v
       console.log(e.mp.detail.value)
     },
@@ -197,10 +188,6 @@ export default {
         this.financialDTO.financialDetailList = [
           ...this.financialDTO.financialDetailList,
           this._financialDetailFactory()
-        ]
-        this.selfDetailList = [
-          ...this.selfDetailList,
-          this._selfDetailFactory()
         ]
       }
     },
@@ -211,23 +198,23 @@ export default {
         success: (res) => {
           if (res.confirm) {
             this.financialDTO.financialDetailList.splice(financialDetailIndex, 1)
-            this.selfDetailList.splice(financialDetailIndex, 1)
           }
         }
       })
     },
     async _save () {
       console.log(this.financialDTO)
-      try {
-        const result = await createFinancial(this.financialDTO)
-        console.log(result)
-      } catch (e) {
-        console.log('error', e)
-        this.utils.showError(e.msg, 1000)
-      }
+      // try {
+      //   const result = await createFinancial(this.financialDTO)
+      //   this.utils.showToast('保存成功', 1000)
+      //   console.log(result)
+      // } catch (e) {
+      //   console.log('error', e)
+      //   this.utils.showError(e.msg, 1000)
+      // }
     }
   },
-  onLoad (options) {
+  async onLoad (options) {
     console.log(this.financialUserList[0].userName)
     this.isAdd = options.type === 'add'
     if (this.isAdd) { // init
@@ -235,7 +222,10 @@ export default {
         ...this._financialMasterFactory(),
         financialDetailList: [this._financialDetailFactory()]
       }
-      this.selfDetailList = [this._selfDetailFactory()]
+    } else { // edit
+      const result = await getMonthDetails(options.masterId)
+      this.financialDTO = result.data
+      console.log('明细', result)
     }
     console.log(this.financialCategoryList)
   }
