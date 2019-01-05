@@ -42,7 +42,7 @@
         <div class="value" style="display: flex; align-items: center">
           <span>{{ financialDetail.debt ? '-' : '+' }}</span>
           <input type="digit"
-                 :placeholder="financialPricePlaceholder"
+                 placeholder="请输入金额"
                  class="input"
                  :value="detailPrices[financialDetailIndex]"
                  @blur="_priceChange($event, financialDetailIndex)">
@@ -119,9 +119,6 @@ export default {
   },
   computed: {
     ...mapState(['financialCategoryList', 'financialUserList']),
-    financialPricePlaceholder () {
-      return this.debt ? '请输入负债金额' : '请输入盈利金额'
-    },
     financialMonth () {
       if (!this.financialDTO.financialDate) return null
       return this.financialDTO.financialDate.slice(0, -3)
