@@ -132,7 +132,7 @@ export default {
     // console.log('上拉加载')
     await this.fetchList(false)
   },
-  async mounted () {
+  async onShow () {
     await sleep(50)
     wx.startPullDownRefresh()
   }

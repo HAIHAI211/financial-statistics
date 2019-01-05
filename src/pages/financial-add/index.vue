@@ -76,7 +76,7 @@
 <script>
 import {mapState} from 'vuex'
 import ENUM from '@/enum'
-import {getMonthDetails} from '@/http/api'
+import {createFinancial, updateFinancial, getMonthDetails} from '@/http/api'
 import MyPicker from '@/components/my-picker'
 import {getDate} from 'harrison-mp-utils/date'
 export default {
@@ -184,12 +184,10 @@ export default {
       console.log(e.mp.detail.value)
     },
     _add () { // 新增financialDetail
-      if (this.isAdd) {
-        this.financialDTO.financialDetailList = [
-          ...this.financialDTO.financialDetailList,
-          this._financialDetailFactory()
-        ]
-      }
+      this.financialDTO.financialDetailList = [
+        ...this.financialDTO.financialDetailList,
+        this._financialDetailFactory()
+      ]
     },
     _close (financialDetailIndex) { // 删除financialDetail
       wx.showModal({
@@ -204,25 +202,28 @@ export default {
     },
     async _save () {
       console.log(this.financialDTO)
-      // try {
-      //   const result = await createFinancial(this.financialDTO)
-      //   this.utils.showToast('保存成功', 1000)
-      //   console.log(result)
-      // } catch (e) {
-      //   console.log('error', e)
-      //   this.utils.showError(e.msg, 1000)
-      // }
+      try {
+        let func = this.isAdd ? createFinancial : updateFinancial
+        const result = await func(this.financialDTO)
+        this.utils.showToast('保存成功', 1000)
+        console.log(result)
+      } catch (e) {
+        console.log('error', e)
+        this.utils.showError(e.msg, 1000)
+      }
     }
   },
   async onLoad (options) {
     console.log(this.financialUserList[0].userName)
     this.isAdd = options.type === 'add'
     if (this.isAdd) { // init
+      wx.setNavigationBarTitle({title: '新增'})
       this.financialDTO = {
         ...this._financialMasterFactory(),
         financialDetailList: [this._financialDetailFactory()]
       }
     } else { // edit
+      wx.setNavigationBarTitle({title: '修改'})
       const result = await getMonthDetails(options.masterId)
       this.financialDTO = result.data
       console.log('明细', result)

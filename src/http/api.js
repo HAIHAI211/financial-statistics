@@ -37,13 +37,6 @@ export const get = (params) => {
 export const post = (params) => {
   return fly.post(`${host}${params.url}`, params.data)
 }
-// 创建财务报表
-export const createFinancial = (params) => {
-  return post({
-    url: '/financial/create',
-    data: params
-  })
-}
 
 // 获取财务类别
 export const getFinancialCategory = (params) => {
@@ -56,6 +49,22 @@ export const getFinancialCategory = (params) => {
 export const getFinancialUser = (params) => {
   return get({
     url: '/financial/user'
+  })
+}
+
+// 创建月报表
+export const createFinancial = (params) => {
+  return post({
+    url: '/financial/create',
+    data: params
+  })
+}
+
+// 修改月报表
+export const updateFinancial = (params) => {
+  return post({
+    url: '/financial/update',
+    data: params
   })
 }
 
