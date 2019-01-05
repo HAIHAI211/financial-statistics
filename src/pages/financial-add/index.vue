@@ -10,7 +10,6 @@
           <div class="iconfont icon-sanjiao sanjiao-more"/>
         </div>
     </picker>
-    <button plain class="save-btn" @click="_save">保存</button>
     <div class="card"
          v-for="(financialDetail, financialDetailIndex) in financialDTO.financialDetailList"
          :key="financialDetailIndex">
@@ -37,13 +36,11 @@
       <div class="item">
         <div class="label">负债：</div>
         <div class="value" style="margin-right:30rpx;">
-          <switch :checked="financialDetail.isDebt"
-                  @change="_debtSwitchChange($event,financialDetailIndex)"
-                  color="#990000" type="checkbox"/>
+          <switch :checked="financialDetail.debt" @change="_debtSwitchChange($event,financialDetailIndex)" color="#990000" type="checkbox"/>
         </div>
         <div class="label">金额：</div>
         <div class="value" style="display: flex; align-items: center">
-          <span>{{ financialDetail.isDebt ? '-' : '+' }}</span>
+          <span>{{ financialDetail.debt ? '-' : '+' }}</span>
           <input type="digit"
                  :placeholder="financialPricePlaceholder"
                  class="input"
@@ -51,14 +48,14 @@
                  @blur="_priceChange($event, financialDetailIndex)">
         </div>
       </div>
-      <div class="item" v-if="financialDetail.isDebt">
+      <div class="item" v-if="financialDetail.debt">
         <div class="label">最迟还款日：</div>
         <div class="value" style="margin-right:30rpx;">
           <picker
             mode="date"
             fields="day"
             :value="financialDetail.deadline"
-            @change="_deadlineChange">
+            @change="_deadlineChange($event, financialDetailIndex)">
             <div class="picker deadline-picker">
               {{financialDetail.deadline}}
             </div>
@@ -66,16 +63,16 @@
         </div>
         <div class="label">已还清：</div>
         <div class="value">
-          <switch @change="_paySwitchChange($event, financialDetailIndex)" color="#990000"/>
+          <switch :checked="financialDetail.hasPay" @change="_paySwitchChange($event, financialDetailIndex)" color="#990000"/>
         </div>
       </div>
     </div>
     <div class="add-btn" @click="_add">+</div>
+    <button plain class="save-btn" @click="_save" :loading="loading">保存</button>
   </div>
 </template>
 <script>
 import {mapState} from 'vuex'
-import ENUM from '@/enum'
 import {createFinancial, updateFinancial, getMonthDetails} from '@/http/api'
 import MyPicker from '@/components/my-picker'
 import {getDate} from 'harrison-mp-utils/date'
@@ -88,9 +85,9 @@ export default {
   data () {
     return {
       scope: {},
-      ENUM: ENUM,
       isAdd: true,
-      more: true,
+      disabled: false, // 提交按钮是否不可用
+      loading: false, // 提交按钮是否正在加载
       financialCategory: {
         categoryId: 5,
         categoryType: 5,
@@ -111,9 +108,9 @@ export default {
             userId: null,
             categoryType: null,
             financialPrice: 0,
-            isDebt: ENUM.DEBT,
+            debt: true,
             deadline: null,
-            hasPay: ENUM.NO_PAY
+            hasPay: false
           }
         ]
       },
@@ -123,7 +120,7 @@ export default {
   computed: {
     ...mapState(['financialCategoryList', 'financialUserList']),
     financialPricePlaceholder () {
-      return this.isDebt ? '请输入负债金额' : '请输入盈利金额'
+      return this.debt ? '请输入负债金额' : '请输入盈利金额'
     },
     financialMonth () {
       if (!this.financialDTO.financialDate) return null
@@ -155,8 +152,8 @@ export default {
         categoryType: this.financialCategoryList[0].categoryType,
         financialPrice: 0,
         deadline: getDate(new Date()).formatDate,
-        isDebt: ENUM.DEBT,
-        hasPay: ENUM.NO_PAY
+        debt: true,
+        hasPay: false
       }
     },
     _monthChange (e) {
@@ -165,22 +162,23 @@ export default {
       this.financialDTO.financialDate = monthStr + '-01'
     },
     _deadlineChange (e, financialDetailIndex) {
+      console.log(financialDetailIndex)
       this.financialDTO.financialDetailList[financialDetailIndex].deadline = e.mp.detail.value
     },
     _debtSwitchChange (e, finanicalDetailIndex) {
       console.log(e.mp.detail.value)
-      let isDebt = e.mp.detail.value
+      let debt = e.mp.detail.value
       let price = this.selfPrices[finanicalDetailIndex]
-      this.financialDTO.financialDetailList[finanicalDetailIndex].isDebt = isDebt ? 1 : 0
-      this.financialDTO.financialDetailList[finanicalDetailIndex].financialPrice = isDebt ? -price : price
+      this.financialDTO.financialDetailList[finanicalDetailIndex].debt = debt
+      this.financialDTO.financialDetailList[finanicalDetailIndex].financialPrice = debt ? -price : price
     },
     _paySwitchChange (e, financialDetailIndex) {
-      this.financialDTO.financialDetailList[financialDetailIndex].hasPay = e.mp.detail.value ? 1 : 0
+      this.financialDTO.financialDetailList[financialDetailIndex].hasPay = e.mp.detail.value
     },
     _priceChange (e, financialDetailIndex) {
       let v = Math.abs(e.mp.detail.value)
-      let isDebt = this.financialDTO.financialDetailList[financialDetailIndex].isDebt
-      this.financialDTO.financialDetailList[financialDetailIndex].financialPrice = isDebt ? -v : v
+      let debt = this.financialDTO.financialDetailList[financialDetailIndex].debt
+      this.financialDTO.financialDetailList[financialDetailIndex].financialPrice = debt ? -v : v
       console.log(e.mp.detail.value)
     },
     _add () { // 新增financialDetail
@@ -204,12 +202,17 @@ export default {
       console.log(this.financialDTO)
       try {
         let func = this.isAdd ? createFinancial : updateFinancial
+        this.loading = true
+        this.disabled = true
         const result = await func(this.financialDTO)
         this.utils.showToast('保存成功', 1000)
         console.log(result)
       } catch (e) {
         console.log('error', e)
         this.utils.showError(e.msg, 1000)
+      } finally {
+        this.loading = false
+        this.disabled = true
       }
     }
   },
