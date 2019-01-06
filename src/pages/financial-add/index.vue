@@ -1,6 +1,7 @@
 <template>
   <div class="financial-add-page">
     <picker
+      v-if="financialDTO.financialDate"
       mode="date"
       fields="month"
       :value="financialMonth"
@@ -31,7 +32,7 @@
             <div class="iconfont icon-sanjiao sanjiao-more"/>
           </div>
         </my-picker>
-        <div class="close-btn" @click="_close(financialDetailIndex)">✖</div>
+        <div class="close-btn" @click="_close(financialDetailIndex)">X</div>
       </div>
       <div class="item">
         <div class="label">负债：</div>
@@ -237,11 +238,15 @@ export default {
   @import "~@/common/style/mixin.styl"
   @import "~@/common/style/color.styl"
   .financial-add-page{
+    padding-top 50rpx
     padding-bottom 120rpx
     .picker{
       center()
       &.date-picker{
-        margin-bottom 100rpx
+        font-size 40rpx
+        font-weight 300
+        color #222
+        margin-bottom 50rpx
       }
       &.category-picker{
         padding 20rpx 0
@@ -296,6 +301,8 @@ export default {
         .close-btn{
           position absolute
           font-size 40rpx
+          padding 15rpx
+          transform scaleY(0.7)
           color #ddd
           top 0
           right 0

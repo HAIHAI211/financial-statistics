@@ -13,7 +13,7 @@
  *   run-loading 加载组件（mpvue存在bug）
  * */
 import {LOADING_STATE_ENUM} from '../enum'
-import {sleep} from '../rest'
+// import {sleep} from '../rest'
 
 export default {
   components: {
@@ -39,18 +39,6 @@ export default {
     }
   },
   computed: {
-    // pages () {
-    //   let result = []
-    //   for (let i = 0; i < this.apis.length; i++) {
-    //     result.push({
-    //       pageNum: this.initPageNum, // 当前页
-    //       pageSize: this.pageSize, // 一页多少条数据
-    //       pageCount: 10, // 一共多少页
-    //       list: []
-    //     })
-    //   }
-    //   return result
-    // },
     activePage () {
       return this.pages[this.pageIndex]
     },
@@ -125,15 +113,14 @@ export default {
   },
   async onPullDownRefresh () { // 下拉刷新
     // console.log('下拉刷新', this.listKeyName)
-    await this.fetchList()
-    wx.stopPullDownRefresh()
+    try {
+      await this.fetchList()
+    } finally {
+      wx.stopPullDownRefresh()
+    }
   },
   async onReachBottom () { // 上拉加载
     // console.log('上拉加载')
     await this.fetchList(false)
-  },
-  async onShow () {
-    await sleep(50)
-    wx.startPullDownRefresh()
   }
 }

@@ -67,11 +67,9 @@ export default {
   async mounted () {
     this.FETCH_FINANCIAL_CATEGORY_LIST()
     this.FETCH_FINANCIAL_USER_LIST()
-    // const result = await getMonthMasters({
-    //   pageNum: 0,
-    //   pageSize: 10
-    // })
-    // console.log('monthMasters', result)
+  },
+  onShow () {
+    this.fetchList()
   }
 }
 </script>
