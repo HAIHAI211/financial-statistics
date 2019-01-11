@@ -4,6 +4,7 @@
 // const realHost = 'http://localhost:8080/harrisonlanny'
 // const realHost1 = 'http://192.168.31.183:8080/harrisonlanny'
 const tencentHost = 'http://139.199.35.20:8080/harrisonlanny'
+// const jkHost = 'http://192.168.40.70:8080/harrisonlanny'
 const host = tencentHost
 const appId = 'wx71086452be90ee8f'
 const appSecret = '981801959ef65a90fcf057c9edd97b6f'
